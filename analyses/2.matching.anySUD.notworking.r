@@ -1,11 +1,18 @@
 options(digits=3)
 options(scipen=1000000)
 set.seed(0203)
+
+library(designmatch)
+# Zubizarreta et al. (2011) https://doi.org/10.1198/tas.2011.11072
+# Kelz et al. (2013) https://doi.org/10.1097/sla.0b013e31829654f3
+library(cobalt) # to asesss/plot balance
+
 #setwd('C:/LOCAL/Example_Public_Health_Repo')
+#pathi   <- 'C:/Users/21983/OneDrive - ICF/ADIA/study 2/Data'
+#dat <- read.csv('C:/Users/21983/OneDrive - ICF/ADIA/study 2/Data/LS_SUD.csv')
 
-pathi   <- 'C:/Users/21983/OneDrive - ICF/ADIA/study 2/Data'
+dat <- read.csv('data/LS_SUD.csv')
 
-dat <- read.csv('C:/Users/21983/OneDrive - ICF/ADIA/study 2/Data/LS_SUD.csv')
 head(dat)
 colnames(dat)
 #===============================================================================
@@ -25,30 +32,21 @@ dat <- dat[!is.na(dat$y),]
 
 
 ### 3.- 'holding constant' some characteristics
-#Ye: age with respect to a fix date does not make a lot of sense
-# we could use 'age at FU' (at the time the outcome was assessed) OR
-# we could use the year child was born as a cohort indicator
 dat$cohort <- as.numeric(substr(dat$ChildDOB,6,9))
 summary(dat$cohort)
 
 x.n <- c('center', 'childrace_bsl','cohort','childsex_bsl','caregiver_married16','hh_income16')
-summary(dat[,x.n])
-# Ye: if we go for separate analysis by wave,
-# we should also match on historical values of y
-#
-
-#3.1.- create indicators for categorical variables
-#treat missing as a separate category
+#3.0 treat missing as a separate category
 #(so we do not lose cases becosue of missing covariates here)
-dat[,x.n] <- lapply(dat[,x.n] ,addNA,ifany =T)
-X         <- model.matrix(~ .,data=dat[,x.n])[,-1]
-summary(X)
+dat[,x.n] <- lapply(dat[,x.n] ,addNA,ifany =T) #
+summary(dat[,x.n])
+apply(is.na(dat[,x.n]),2,table)
 
 
+
+
+#-------------------------------------------------------------------------------
 ### 4.- Finding mathes
-library(designmatch)
-# Zubizarreta et al. (2011) https://doi.org/10.1198/tas.2011.11072
-# Kelz et al. (2013) https://doi.org/10.1097/sla.0b013e31829654f3
 
 #i.- Group indicator
 # in general 'treatment' indicator
@@ -57,45 +55,44 @@ library(designmatch)
 dat <- dat[order(dat$y,decreasing =T),]
 t_ind = dat$y
 
-#ii.- Distance matrix
+#ii.- Distance matrix-----------------------------------------------------------
 # A measure of similarity/disimilarity in the covariates
 # to shose individual matches
 
-x0 <- c('center', 'childrace_bsl','childsex_bsl','caregiver_married16','hh_income16')
-X0         <- model.matrix(~ .,data=dat[,x0])[,-1]
-dist_mat = distmat(t_ind, X0)
+x <- c('center', 'childrace_bsl','cohort','childsex_bsl','caregiver_married16','hh_income16')
+X         <- model.matrix(~ .,data=dat[,x])[,-1]
+dist_mat = distmat(t_ind, X)
 
-#iii.  Moment balance
+#iii.  Moment balance-----------------------------------------------------------
 # constrain differences in means to be at most .05 standard deviations apart
 # this influence the marginal distribution not the individual matches
 
-#alternative, z is the location variable not included in moment balance
-#mom_tols = round(absstddif(cbind(X,Z), t_ind, .05), 2)
-#mom = list(covs = cbind(X,Z), tols = mom_tols)
-
-mom_tols = round(absstddif(X, t_ind, .05), 2)#if there is a rare factors (e.g., NA), either take it out from X, or change .05 to larger number .1, .15
-mom = list(covs = X, tols = mom_tols)
+z <- c('center', 'childrace_bsl','cohort','childsex_bsl','caregiver_married16','hh_income16')
+Z         <- model.matrix(~ .,data=dat[,z])[,-1]
+mom_tols = round(absstddif(Z, t_ind, .05), 2)#if there is a rare factors (e.g., NA), either take it out from X, or change .05 to larger number .1, .15
+mom = list(covs = Z, tols = mom_tols)
 
 
-#iv.- Subset matching weight
+#iv.- Subset matching weight----------------------------------------------------
 # this is a tunning parameter that regulate tredeoff between
 # number of matches and quality of the matches
-subset_weight =   median(dist_mat) #this parameter regulate matches, if qulaity getting bad or drop a lot of cases, can change
+subset_weight =  median(dist_mat) #this parameter regulate matches, if qulaity getting bad or drop a lot of cases, can change
 
 #! Ye: there are some other parameters that you can adjust
 #! see help(bmatch) and/or reference
 #! e.g., if we go for diffrent waves, we may want to match exactly on
 #! hisotrical values of the outcome (e.g., y12 if we are looking at y14)
 
-# Fine balance, same as moment blance, but for factors
-#fine_covs = cbind(black, hispanic, married, nodegree)
+# Fine balance, same as moment blance, but for factors--------------------------
+
+#fine_covs =  model.matrix(~ ., data=dat[,'center'])
 #fine = list(covs = fine_covs)
 
 # Exact matching
 #exact_covs = cbind(black)
 #exact = list(covs = exact_covs)
 
-#v.- Solver options
+#v.- Solver options-------------------------------------------------------------
 t_max = 60*5
 solver = "glpk"
 approximate = 1
@@ -107,14 +104,12 @@ out <- bmatch(t_ind = t_ind, dist_mat = dist_mat, subset_weight = subset_weight,
   mom = mom,  solver = solver)
 
 
-### 5.-  assess balance
-library(cobalt) # to asesss/plot balance
-
+### 5.-  assess balance---------------------------------------------------------
 bal.tab(out,treat=t_ind,covs=X,s.d.denom='treated',un = TRUE,disp = c("means", "sds"))
 
 lplot <- love.plot(out,treat=t_ind,covs=X,thresholds = c(m = .1), binary = "std",s.d.denom='treated')
 lplot
-png('ADIA/output/love.plot.png',width = 480*4,heigh=480*4,res=300)
+png('output/love.plot.png',width = 480*4,heigh=480*4,res=300)
 lplot
 dev.off()
 
