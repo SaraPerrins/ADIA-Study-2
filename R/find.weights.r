@@ -20,3 +20,4 @@ find.weights <- function(phi_X, lambda=0) {
   return(slw)
   }
 ##test editing Ye
+#the test worked!!!
