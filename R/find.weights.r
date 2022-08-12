@@ -19,3 +19,4 @@ find.weights <- function(phi_X, lambda=0) {
   slw <- round(result$getValue(w),4)
   return(slw)
   }
+##
