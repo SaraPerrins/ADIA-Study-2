@@ -118,13 +118,14 @@ table(out$group_id,useNA='ifany')
 sdat <- dat[c(out$t_id,out$c_id	),]
 dim(sdat)
 sdat$id <- out$group_id
-save(sdat, file=file.path(pathi,'anySUD.m.Rda'))
-write.csv(sdat,file=file.path(pathi,'anySUD_matched.csv'),na='')
+saveRDS(sdat, file='data/anySUD.m.Rds')
+#write.csv(sdat,file=file.path(pathi,'anySUD_matched.csv'),na='')
 #Ye: you may watn to save files and plots
 
 #===============================================================================
 ###II. Exploring possible protective factors
 #===============================================================================
+sdat <- readRDS(sdat, file='data/anySUD.m.Rds')
 #1. define a training sample
 length(unique(sdat$id))
 ts0 <- sample(unique(sdat$id[dat$y==1]),length(unique(sdat$id[dat$y==1]))/2)
@@ -162,7 +163,7 @@ library(evtree)
 efit <- evtree(factor(y)~., data=data.frame(y=sdat$y,Z)[sdat$id%in%ts,])
 plot(efit)
 
-png('ADIA/output/tree.plot.png',width = 480*4,heigh=480*4,res=300)
+png('output/tree.plot.png',width = 480*4,heigh=480*4,res=300)
 plot(efit)
 dev.off()
 
