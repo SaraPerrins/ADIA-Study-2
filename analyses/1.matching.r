@@ -4,11 +4,6 @@ set.seed(0203)
 
 library(tidyverse)
 
-library(designmatch)
-# Zubizarreta et al. (2011) https://doi.org/10.1198/tas.2011.11072
-# Kelz et al. (2013) https://doi.org/10.1097/sla.0b013e31829654f3
-library(cobalt) # to asesss/plot balance
-
 #setwd('C:/LOCAL/Example_Public_Health_Repo')
 #pathi   <- 'C:/Users/21983/OneDrive - ICF/ADIA/study 2/Data'
 #dat <- read.csv('C:/Users/21983/OneDrive - ICF/ADIA/study 2/Data/LS_SUD.csv')
@@ -17,8 +12,9 @@ dat <- readRDS('data/LS_SUD.Rds')
 
 head(dat)
 colnames(dat)
+
 #===============================================================================
-### I.- Developing sample
+### 1.- Developing sample
 #===============================================================================
 ### 1.- We focus on population expericing ACE during childhood
 # (and before the otucome was asssess)
@@ -31,9 +27,11 @@ dat$y <- dat$anysud
 table(dat$y,useNA='ifany')
 dat <- dat[!is.na(dat$y),]
 
+### .-  Finding mathes----------------------------------------------------------
+library(designmatch)
+# Zubizarreta et al. (2011) https://doi.org/10.1198/tas.2011.11072
+# Kelz et al. (2013) https://doi.org/10.1097/sla.0b013e31829654f3
 
-#-------------------------------------------------------------------------------
-### 4.- Finding mathes
 
 #i.- Group indicator
 # in general 'treatment' indicator
@@ -89,7 +87,9 @@ out <- bmatch(t_ind = t_ind, dist_mat = dist_mat, subset_weight = subset_weight,
   mom = mom,  solver = solver)
 
 
-### 5.-  assess balance---------------------------------------------------------
+### .-  assess balance----------------------------------------------------------
+library(cobalt) # to asesss/plot balance
+
 bal.tab(out,treat=t_ind,covs=X,s.d.denom='treated',un = TRUE,disp = c("means", "sds"))
 
 lplot <- love.plot(out,treat=t_ind,covs=X,thresholds = c(m = .1), binary = "std",s.d.denom='treated')
@@ -107,6 +107,7 @@ saveRDS(sdat, file='data/anySUD.m.Rds')
 #write.csv(sdat,file=file.path(pathi,'anySUD_matched.csv'),na='')
 #Ye: you may watn to save files and plots
 table(sdat$id)
+
 #===============================================================================
 ###II. Exploring possible protective factors
 #===============================================================================
@@ -152,7 +153,7 @@ sdat$Z <-
   .[,-dim(.)[2]]
 
 
-#test
+#test!!!!!!!!!
 sdat$x <- ifelse(runif(length(sdat$y ))>0.25,!sdat$y,sdat$y)
 table(sdat$x,sdat$y)
 
