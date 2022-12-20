@@ -1,5 +1,5 @@
-options(digits=3)
-options(scipen=1000000)
+options(digits = 3)
+options(scipen = 1000000)
 set.seed(0203)
 
 library(dplyr)
@@ -8,11 +8,14 @@ library(designmatch)
 # Kelz et al. (2013) https://doi.org/10.1097/sla.0b013e31829654f3
 library(cobalt) # to asesss/plot balance
 
-#setwd('C:/LOCAL/Example_Public_Health_Repo')
-#pathi   <- 'C:/Users/21983/OneDrive - ICF/ADIA/study 2/Data'
-#dat <- read.csv('C:/Users/21983/OneDrive - ICF/ADIA/study 2/Data/LS_SUD.csv')
+# Ye, un-comment the following line and all path should be corected
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#setwd('C:/Users/21983/OneDrive - ICF/ADIA/study 2/')#@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-dat <- read.csv('C:/Users/21983/OneDrive - ICF/ADIA/study 2/Data/LS_MH_PCE_anyt.csv')
+#dat <- read.csv('/Data/LS_MH_PCE_anyt.csv')
+dat <- read.csv('data/LS_MH_PCE_anyt.csv')
+
 dim(dat)
 head(dat)
 colnames(dat)
@@ -21,8 +24,9 @@ colnames(dat)
 #===============================================================================
 ### 1.- We focus on population expericing ACE during childhood
 # (and before the otucome was asssess)
-dat$anyACE <- apply(dat[,c('M','MP','MS','MN','MF','ML','ME','MM','MD')],1,sum)>=1
-table(dat$anyACE )
+dat$anyACE <- apply(
+    dat[, c('M','MP','MS','MN','MF','ML','ME','MM','MD')], 1, sum) >= 1
+table(dat$anyACE)
 dat <- dat[dat$anyACE,]
 
 ### 2.- In that population, we want to campare those who develop a certain outcome to those who do not
@@ -111,7 +115,7 @@ bal.tab(out,treat=t_ind,covs=X,s.d.denom='treated',un = TRUE,disp = c("means", "
 
 lplot <- love.plot(out,treat=t_ind,covs=X,thresholds = c(m = .1), binary = "std",s.d.denom='treated')
 lplot
-png('C:/Users/21983/OneDrive - ICF/ADIA/study 2/output/anyMH.love.plot.7.png',width = 480*4,heigh=480*4,res=300)
+png('output/anyMH.love.plot.7.png', width = 480*4,heigh=480*4,res=300)
 lplot
 dev.off()
 
@@ -120,56 +124,125 @@ table(out$group_id,useNA='ifany')
 sdat <- dat[c(out$t_id,out$c_id	),]
 dim(sdat)
 sdat$id <- out$group_id
-saveRDS(sdat, file='C:/Users/21983/OneDrive - ICF/ADIA/study 2/data/anyMH7.m.Rds')
+saveRDS(sdat, file='data/anyMH7.m.Rds')
+#C:/Users/21983/OneDrive - ICF/ADIA/study 2
 #write.csv(sdat,file=file.path(pathi,'anySUD_matched.csv'),na='')
 #Ye: you may watn to save files and plots
 
 #===============================================================================
 ###II. Exploring possible protective factors
 #===============================================================================
-sdat <- readRDS(sdat, file='C:/Users/21983/OneDrive - ICF/ADIA/study 2/data/anyMH7.m.Rds')
+sdat <- readRDS(sdat, file='data/anyMH7.m.Rds')
+
 #1. define a training sample
 length(unique(sdat$id))
-ts <- sample(unique(sdat$id),length(unique(sdat$id)/2))
-#ts1 <- sample(unique(sdat$id[dat$y==0]),length(unique(sdat$id[dat$y==0]))/2)
-#ts  <- c(ts0,ts1)
+set.seed(0203)
+ts <- sample(unique(sdat$id), length(unique(sdat$id)) / 2)
+sdat$ts <- sdat$id %in% ts
+
 
 #2.- Protective factors
-#Ye: this is only a place holder you can include many more
 dim(sdat)
 summary(sdat)
-#z.n <- c('anysupadu_1',  	'anysupparent_1',  	'anysuprelative_1',  	'anysupnonfam_1',  	'fam_sat_1',  	'home_safety_1',  	
-#         'prrelation_1',  	'neighborhood_exp_1',  	'school_safety_t_1',  	'srvc_use_1',  	'childcare_1',  	
-#         'neighborhood_safety_2',  	'neighborhood_exp_2',  	'school_safety_y_2',  	'school_safety_t_2',  	
-#         'srvc_use_2',  	'anysupadu_3',  	'anysupparent_3',  	'anysuprelative_3',  	'anysupnonfam_3',  	'prrelation_3',  	
-#         'bestfriend_3',  	'socialpart_3',  	'parent_involv_3',  	'resid_stab_3',  	'neighborhood_safety_3',  	'neighborhood_exp_3',  	
-#         'srvc_use_3')  
-
-#z.n <- c('anysupadu_1',  	'anysupparent_1',  	'anysuprelative_1',  	'anysupnonfam_1',
-#           'anysupadu_3',  	'anysupparent_3',  	'anysuprelative_3', 'anysupnonfam_3',
-#           'fam_sat_1',  	'home_safety_1',  	'prrelation_1',  'prrelation_3', 'bestfriend_3',  	'socialpart_3',  	'parent_involv_3')
-
-#z.n <- c('neighborhood_exp_1', #'school_safety_t_1'#, 'neighborhood_safety_2', 'neighborhood_exp_2', 'school_safety_y_2', #'school_safety_t_2#',
-#'resid_stab_3', 'neighborhood_safety_3', 'neighborhood_exp_3')
-
-#z.n <- c('srvc_use_1', 'childcare_1', 'srvc_use_2', 'srvc_use_3')
-
 #PCE across time indicators
 z.n  <- c('anysupadu', 'anysupparent', 'anysuprelative', 'anysupnonfam', 'fam_sat', 'home_safety', 'prrelation',
           'bestfriend', 'socialpart', 'parent_involv', 'resid_stab', 'neighborhood_safety', 'neighborhood_exp',
           'school_safety_y', 'srvc_use', 'childcare')
 
-#get rid PCE with only one time point and lot of missingness
-#z.n  <- c('anysupadu', 'anysupparent', 'anysuprelative', 'anysupnonfam', 'fam_sat', #'home_safety' 
-#          'prrelation', #'bestfriend', 'socialpart', 'parent_involv', 'resid_stab', 
-#          'neighborhood_safety', 'neighborhood_exp',
-#          'school_safety_y', 'srvc_use', 'childcare')
-         
-summary(sdat[,z.n])
+summary(sdat[, z.n])
 
 
+###2.2- centering
+# we need to center covariates at the pair-mean
+# Stanfill et al. (2019) https://doi.org/10.1177/1179597219858954
+
+#'old school' way
+#sdat   <-  sdat[order(sdat$id),]
+#sdat$Z <-  model.matrix(~ ., model.frame(~ ., sdat[,z.n], na.action=na.pass))[,-1]
+#sdat$Z <-  do.call(rbind,lapply(split(data.frame(Z),sdat$id), function(d) apply(d,2,scale,scale=F) ))
+
+#tider
+library(tidyverse)
+sdat$Z <-
+  sdat[, z.n] %>%
+  with(., model.matrix(~ .,
+    model.frame(~ ., data=., na.action = na.pass))[,-1]) %>%
+  data.frame() %>%
+  group_by(sdat$id) %>%
+  mutate(across(everything(), scale, scale = FALSE)) %>%
+  ungroup %>%
+  .[, -dim(.)[2]]
+
+#-------------------------------------------------------------------------------
+###Ye: this is a small simulation test
+# It generates a predictor X
+# and check that the procedure captures the predictor
+#sdat$x <- ifelse(runif(length(sdat$y ))>0.25,!sdat$y,sdat$y)
+#table(sdat$x,sdat$y)
+
+#sdat$Z <-
+#  sdat[,c(z.n,'x')] %>%
+#  with(., model.matrix(~ ., model.frame(~ ., data=.,na.action=na.pass))[,-1]) %>%
+#  data.frame ()%>%
+#  group_by(sdat$id) %>%
+#  mutate(across(everything(),scale,scale=F)) %>%
+#  ungroup %>%
+#  .[,-dim(.)[2]]
+#-------------------------------------------------------------------------------
+
+###3. - Run tree algorithm on training data
+
+#3.1. - evolutionary tree (just for comparisson)
+library(evtree)
+efit <- with(sdat[sdat$id %in% ts, ], evtree(factor(y) ~.,
+  data = na.omit(data.frame(y, Z))))
+plot(efit)
 
 
+###3.2.- calssical tress (does not requiere listwise deletion)
+#a.- grow large tree
+library(rpart)
+set.seed(0203)
+tree <- with(sdat[sdat$ts, ], rpart(factor(y) ~ . ,
+  data = data.frame(y, Z), cp = -1, xval = 10,
+  method = "class"))
+
+plotcp(tree, col = "red")
+help(rpart)
+#A good choice of cp for pruning is often 
+#the leftmost value for which the mean lies below the horizontal line.
+
+#b.- prune based on complexity
+opcp <- tree$cptable[, "CP"][which.min(tree$cptable[, "xerror"])]
+ptree <- prune(tree, cp = opcp)
+
+#Ye: chose the plot you like the most to sace
+plot(as.party(ptree))
+
+library(rpart.plot)
+rpart.plot(ptree)
 
 
+png("output/tree.plot.png", width = 480 * 4, heigh = 480 * 4, res = 300)
+rpart.plot(ptree)
+dev.off()
 
+#===============================================================================
+###.-inference (95% CI; p-values)
+#===============================================================================
+
+sdat$node.rtree <- factor(predict(as.party(ptree),
+    type = "node", newdata = sdat$Z))
+table(sdat$node.rtree)
+
+
+library(survival)
+cfite <- clogit(y ~ node.rtree  + strata(id), data = sdat[!sdat$ts, ])
+anova(cfite, update(cfite, . ~ 1 +  strata(id)))
+summary(cfite)
+
+
+#mean by group in training and validation data
+t(with(sdat[sdat$ts,], tapply(y, node.rtree, mean)))
+t(with(sdat[!sdat$ts,], tapply(y, node.rtree, mean)))
+table(sdat$node.rtree)

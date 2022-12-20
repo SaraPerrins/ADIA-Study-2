@@ -20,6 +20,7 @@ sdat$y <- sdat$anyMH
 
 #simple random sample
 dim(sdat)
+set.seed(0203)
 ts <- sample(unique(sdat$id),length(unique(sdat$id))/2)
 
 
@@ -49,8 +50,8 @@ df0 <- sdat[sdat$id%in%ts,]
 df0$w <- 1
 
 #a.- grow large tree
-tree <- with(df0, rpart(y ~ . , data=cbind(y,X,Z),cp=-1,xval = 10))
-plotcp(tree,col='red' )
+tree <- with(df0, rpart(y ~ . , data = cbind(y,X,Z),cp=-1,xval = 10))
+plotcp(tree,col= 'red' )
 #A good choice of cp for pruning is often the leftmost value for which the mean lies below the horizontal line.
 
 #b.- prune based on complexity

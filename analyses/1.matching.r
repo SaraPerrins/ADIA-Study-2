@@ -13,6 +13,8 @@ dat <- readRDS('data/LS_SUD.Rds')
 head(dat)
 colnames(dat)
 
+
+
 #===============================================================================
 ### 1.- Developing sample
 #===============================================================================
@@ -181,8 +183,8 @@ dev.off()
 library(rpart)
 library(rpart.plot)
 #a.- grow large tree
-tree <- with(sdat[sdat$ts,], rpart(y ~ . , data=cbind(y,Z),cp=-1,method = 'class'))
-plotcp(tree,col='red' )
+tree <- with(sdat[sdat$ts,], rpart(y ~ . , data=cbind(y,Z), cp=-1, method = 'class'))
+plotcp(tree, col='red' )
 
 #b.- prune based on complexity
 opcp <- tree$cptable[,'CP'][which.min(tree$cptable[,'xerror'])]
@@ -200,8 +202,7 @@ dev.off()
 ###.-inference (95% CI; p-values)
 #===============================================================================
 
-sdat$node.etree <- factor(predict(efit,type='node',newdata=sdat$Z))
-table(sdat$node.etree)
+ 
 
 sdat$node.rtree <- factor(predict(as.party(ptree),type='node',newdata=sdat$Z))
 table(sdat$node.rtree)
