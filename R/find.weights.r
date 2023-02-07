@@ -1,6 +1,6 @@
 library(CVXR)
 
-find.weights <- function(phi_X, lambda=0) {
+find.weights <- function(phi_X, lambda = 0) {
   #https://web.stanford.edu/~boyd/papers/pdf/cvxr_paper.pdf
   #  see page 18  Kelly gambling
   n             <-  dim(phi_X)[1]
@@ -16,7 +16,7 @@ find.weights <- function(phi_X, lambda=0) {
   result        <- solve(problem)
 
   print(result$status)
-  slw <- round(result$getValue(w),4)
+  slw <- round(result$getValue(w), 4)
   return(slw)
   }
 ##test editing Ye

@@ -1,5 +1,5 @@
-options(digits=3)
-options(scipen=1000000)
+options(digits = 3)
+options(scipen = 1000000)
 set.seed(0203)
 library(tidyverse)
 # Ye, un-comment the following line and all path should be corected
@@ -155,6 +155,47 @@ dat$node.cau  <- factor(
                   predict(partykit:::as.party(ptree_causal),
                   type = "node", newdata = dat))
 table(dat$node.cau)
+
+
+#' predict node is supposed to predict node membership even
+#' when some of the variables defining primary splits are missing
+#' using "surrogate splits"
+#' I am not sure it is doing a good job
+#' Thus I propose to use only cases with no missing
+#' on spliting variables
+partykit:::.list.rules.party(partykit:::as.party(ptree_causal))
+dat <-
+  dat %>%
+  mutate(pf =
+    case_when(
+    socialpart >= 0.5 & prrelation < 0.5 ~ 3
+    , socialpart >= 0.5 & prrelation >= 0.5 ~ 4
+    , socialpart < 0.5 ~ 5
+    )
+    , pf = factor(pf)
+    )
+
+table(dat$pf, dt$node.cau, useNA = "ifany")
+
+rpart.rules(ptree_causal, roundint = FALSE)
+
+with(dat[dat$training.sample == 1, ],
+  weighted.mean(y[anyACE], cw[anyACE]) -
+  weighted.mean(y[!anyACE], cw[!anyACE])
+  )
+
+sapply(split(dat[dat$training.sample == 1, ]
+  , dat$pf[dat$training.sample == 1]), \(data){ with(data, 
+  weighted.mean(y[anyACE], cw[anyACE]) -
+  weighted.mean(y[!anyACE], cw[!anyACE])
+)})
+
+sapply(split(dat[dat$training.sample == 1, ]
+  , dat$node.cau[dat$training.sample == 1]), \(data){ with(data, 
+  weighted.mean(y[anyACE], cw[anyACE]) -
+  weighted.mean(y[!anyACE], cw[!anyACE])
+)})
+
 #===============================================================================
 ### . Inferece
 #===============================================================================
