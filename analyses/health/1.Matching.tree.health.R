@@ -23,9 +23,9 @@ outv <- "PH_Health"
 #===============================================================================
 
 dat <- read.csv('data/LS_all.csv')
-head(dat)
+#head(dat)
 colnames(dat)
-summary(dat)
+#summary(dat)
 #===============================================================================
 ### I.- Developing sample
 #===============================================================================
@@ -123,10 +123,9 @@ print(baltab, un = FALSE, disp.v.threshold = FALSE)
 
 lplot <- love.plot(out,treat=t_ind,covs=X,thresholds = c(m = .1), binary = "std",s.d.denom='treated')
 lplot
-png(paste0("output/",outv,".love.plot.png"), width = 480*4,heigh=480*4,res=300)
-lplot
-dev.off()
-
+#png(paste0("output/",outv,".love.plot.png"), width = 480*4,heigh=480*4,res=300)
+#lplot
+#dev.off()
 
 table(out$group_id,useNA='ifany')
 sdat <- dat[c(out$t_id,out$c_id	),]
@@ -140,7 +139,7 @@ saveRDS(sdat, file=paste0('data/', outv, '.m.Rds'))
 #===============================================================================
 ###II. Exploring possible protective factors
 #===============================================================================
-sdat <- readRDS(sdat, file=paste0('data/', outv, '.m.Rds'))
+sdat <- readRDS(file = paste0('data/', outv, '.m.Rds'))
 
 #1. define a training sample
 length(unique(sdat$id))

@@ -147,7 +147,7 @@ saveRDS(sdat, file=paste0('data/', outv, '.m.Rds'))
 #===============================================================================
 ###II. Exploring possible protective factors
 #===============================================================================
-sdat <- readRDS(sdat, file=paste0('data/', outv, '.m.Rds'))
+sdat <- readRDS(file=paste0('data/', outv, '.m.Rds'))
 
 #1. define a training sample
 length(unique(sdat$id))
