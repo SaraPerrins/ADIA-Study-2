@@ -16,7 +16,7 @@ library(gt)
 
 
 # Ye: un-comment this next line to change path to your own
-setwd('C:/Users/21983/OneDrive - ICF/ADIA/study 2') 
+#setwd('C:/Users/21983/OneDrive - ICF/ADIA/study 2') 
 
 outv <- "RB_su"
 

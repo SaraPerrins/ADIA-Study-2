@@ -15,7 +15,7 @@ library(rpart.plot)
 library(survey)
 
 
-setwd('C:/Users/21983/OneDrive - ICF/ADIA/study 2') 
+#setwd('C:/Users/21983/OneDrive - ICF/ADIA/study 2') 
 outv <- 'RB_vio'
 #===============================================================================
 
@@ -48,7 +48,9 @@ x.n <- c('center', 'childrace_bsl','cohort','childsex_bsl','caregiver_married16'
 #3.0 treat missing as a separate category
 #(so we do not lose cases becosue of missing covariates here)
 dat[,x.n] <- lapply(dat[,x.n] ,addNA,ifany =T) #
+
 summary(dat[,x.n])
+
 apply(is.na(dat[,x.n]),2,table)
 
 
