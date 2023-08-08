@@ -1,8 +1,8 @@
 # ADIA-Study-2
-Description for ADIA study 2 folder organization 
+#Description for ADIA study 2 folder organization 
 
-1. "Data".  This folder include all data created and used for ADIA-study 2 analysis.
-    i. 
+##1. "Data".  This folder include all data created and used for ADIA-study 2 analysis.
+    ###i. 
     ii.
     iii.
     iv.
