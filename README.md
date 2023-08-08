@@ -7,23 +7,23 @@
     iii.<br>
     iv.<br>
     v.<br>
-##. "SAS Program". This folder include SAS program of data management and cleaning<br>
+##2. "SAS Program". This folder include SAS program of data management and cleaning<br>
     i.<br>
     ii.<br>
     iii.<br>
     iv.<br>
     v.<br>
-##2. "Analysis". Each subfolder include the analysis for each outcome with the following program codes<br>   
+##3. "Analysis". Each subfolder include the analysis for each outcome with the following program codes<br>   
     i. "1.Matching.tree" code implement the "matching case-control" analysis as well as running "classical regression tree" analysis<br>
     ii."2.Causaltree" code implement the "causal regression tree analysis<br>
     iii."3.Matching.pclogit" code implement the Penalised conditional logistic regression analysis<br>
     iv.	"4.Bayesian clogit with horse shoe" code implement Bayesian clogit analysis<br>
-##3. "Descriptive analysis". This folder include SAS program for the ad-hoc descriptive analysis<br>
+##4. "Descriptive analysis". This folder include SAS program for the ad-hoc descriptive analysis<br>
     i.<br>
     ii.<br>
     iii.<br>
     iv.<br>
     v.<br>
-##4. "R".  External function to find the balancing weights for "causal tree" analysis<br>
+##5. "R".  External function to find the balancing weights for "causal tree" analysis<br>
    -"find.weights.r"<br>  
-##5. "Output" folder
+##6. "Output" folder
