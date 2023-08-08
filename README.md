@@ -2,11 +2,6 @@
 #Description for ADIA study 2 folder organization<br> 
 
 1. "Data".  This folder include all data created and used for ADIA-study 2 analysis<br>
-    i.<br>
-    ii.<br>
-    iii.<br>
-    iv.<br>
-    v.<br>
 2. "SAS Program". This folder include SAS program of data management and cleaning<br>
     i."MH_SUD_OUTCOMES_age16&18" create "any mental health" and "any suicidal attempt" outcomes <br>
     ii."RiskBehavior_Outcome" create any risk behavior outcomes <br>
